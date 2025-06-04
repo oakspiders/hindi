@@ -144,6 +144,15 @@
                 showRandomWord();
             }
         }
+        document.addEventListener('keydown', function(event) {
+  const keysToTrigger = ['Enter', ' ', 'ArrowRight', 'ArrowDown'];
+
+  if (keysToTrigger.includes(event.key)) {
+    event.preventDefault();
+    handleBoxClick();
+  }
+});
+
     </script>
 
 </body>

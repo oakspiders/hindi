@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abbas Family - मस्तीभरा हिंदी अक्षर और शब्द जनरेटर</title>
+    <title>Abbas Family - मस्ती भरी हिंदी अक्षर और शब्द जनरेटर</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -93,12 +93,115 @@
                 padding: 10px 20px;
             }
         }
+
+        #demoContent h2 {
+            margin-top: 0;
+            color: #FF5722;
+        }
+
+        #demoContent button {
+            margin-top: 20px;
+            font-size: 1em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        #startDemoBtn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1em;
+            padding: 8px 16px;
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        #startDemoBtn:hover {
+            background-color: #F57C00;
+        }
+
+        .demo-highlight {
+            box-shadow: 0 0 15px 5px #FFC107;
+            transform: scale(1.05);
+            transition: all 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        #demoOverlayMask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+            z-index: 999;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .demo-highlight {
+            position: relative;
+            z-index: 1001 !important;
+            box-shadow: 0 0 15px 5px #FFC107;
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+
+        #displayBox button {
+            z-index: 1100;
+            /* higher than demo box */
+            position: relative;
+            /* ensure z-index works */
+        }
+
+        #devOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: none;
+            z-index: 9998;
+        }
+
+        #devBanner {
+            position: fixed;
+            bottom: 1px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: linear-gradient(90deg, #7a5f95, #fc7025);
+            color: white;
+            font-size: 1.2em;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 5s ease, transform 0.4s ease;
+            z-index: 9999;
+            display: none;
+        }
     </style>
 </head>
 
 <body onclick="handleBoxClick()">
+    <h1>🎉 मस्तीभरी हिंदी सीखें 🎉</h1>
+    <button id="startDemoBtn" onclick="startDemo()">🎥 Demo</button>
 
-    <h1>🎉 मस्तीभरा हिंदी सीखें 🎉</h1>
 
     <div id="display">अ</div>
 
@@ -109,20 +212,1269 @@
         <button id="comboBtn" onclick="event.stopPropagation(); setMode('combo')">🔠 अक्षरों का मेल</button>
     </div>
 
+    <div id="devOverlay"></div>
+    <div id="devBanner" style="display: none;">
+        Made by Hasan Abbas with love 🤍
+        <!-- love 🤍 ❤️ ❥ -->
+    </div>
+
+
+
 
     <script>
+        let demoActive = false;
+
         const hindiLetters = ['अ', 'आ', 'इ', 'ई', 'उ', 'ए', 'ओ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह'];
 
         const simpleWords = [
-            'घर', 'कम', 'नल', 'पन', 'मन', 'बस', 'रस', 'मद', 'धन', 'पल', 'बन', 'खग', 'रथ', 'जम', 'खट', 'पथ',
-            'वन', 'तन', 'धन', 'लक', 'सप', 'डब', 'ठग', 'घस', 'जग', 'दम', 'मल', 'दस', 'रज', 'फन',
-            'बच', 'टक', 'गज', 'बल', 'खल', 'छल', 'ढल', 'थल', 'गण', 'धम', 'पक', 'नर', 'गर', 'भट', 'टम',
-            'सज', 'नथ', 'झग', 'ठस', 'झट', 'मठ', 'कन', 'फक', 'जग', 'मग', 'खग', 'पग', 'ठग', 'नग', 'नल', 'चल', 'कल', 'बल',
-            'पल', 'फल', 'जल', 'छल', 'तल', 'थल', 'हल', 'पर', 'कर', 'डर',
-            'मर', 'सर', 'पथ', 'रथ', 'बस', 'रस', 'दस', 'एक', 'ढक', 'अंक',
-            'खत', 'छत', 'घर', 'धन', 'तन', 'वन', 'फण', 'गम', 'हम', 'जड़',
-            'लड़', 'पढ़', 'सब', 'टब', 'गज', 'आग', 'ईख', 'चख', 'कई', 'कद',
-            'उठ', 'आठ'
+            'घर', // house
+            'कम', // less
+            'नल', // tap
+            'पन', // a suffix indicating state/quality (e.g., बचपन - childhood)
+            'मन', // mind
+            'बस', // bus / enough
+            'रस', // juice / essence
+            'मद', // intoxication / pride
+            'धन', // wealth
+            'पल', // moment
+            'बन', // forest
+            'खग', // bird
+            'रथ', // chariot
+            'जम', // to freeze / to accumulate
+            'खट', // sour (often part of a compound word)
+            'पथ', // path
+            'वन', // forest
+            'तन', // body
+            'ठग', // cheat / swindler
+            'घस', // to rub
+            'जग', // world / pitcher
+            'दम', // breath / strength
+            'मल', // dirt / stool
+            'दस', // ten
+            'रज', // dust
+            'फन', // hood of a snake
+            'बच', // बचाना (to save) - often used as a root
+            'टक', // to stare
+            'गज', // elephant
+            'बल', // strength
+            'खल', // rogue / scoundrel
+            'छल', // deceit
+            'ढल', // to set (sun) / to mold
+            'थल', // land
+            'गण', // group / tribe
+            'धम', // (sound of falling) / to threaten (root of धमकाना)
+            'पक', // to ripen (root of पकना)
+            'नर', // man
+            'गर', // if (often part of अगर)
+            'भट', // soldier / mercenary
+            'सज', // to decorate (root of सजाना)
+            'नथ', // nose ring
+            'झग', // झगड़ना (to fight) - often used as a root
+            'ठस', // dense / stubborn
+            'झट', // quickly / at once
+            'मठ', // monastery
+            'मग', // brain / path (in some contexts)
+            'पग', // foot / step
+            'नग', // gem / mountain
+            'चल', // to walk
+            'कल', // yesterday / tomorrow / machine
+            'फल', // fruit
+            'जल', // water
+            'तल', // bottom / surface
+            'हल', // plow / solution
+            'पर', // on / but / feather
+            'कर', // to do / tax
+            'डर', // fear
+            'मर', // to die
+            'सर', // head / lake / Mr.
+            'एक', // one
+            'ढक', // to cover (root of ढकना)
+            'अंक', // number / mark / lap
+            'खत', // letter
+            'छत', // roof
+            'फण', // hood (of a snake)
+            'गम', // sorrow
+            'हम', // we
+            'जड़', // root / inert
+            'लड़', // to fight (root of लड़ना)
+            'पढ़', // to read / to study (root of पढ़ना)
+            'सब', // all
+            'टब', // tub (from English)
+            'आग', // fire
+            'ईख', // sugarcane
+            'चख', // to taste
+            'कई', // several
+            'कद', // height / stature
+            'उठ', // to get up
+            'आठ', // eight
+
+            // Additions (two-letter words):
+            'कट', // to cut
+            'घट', // to decrease / pot
+            'चट', // quickly / instantly
+            'जप', // to chant
+            'टस', // to budge
+            'तप', // penance / heat
+            'दम', // breath / value
+            'धड़', // thump / heartbeat
+            'नभ', // sky
+            'रट', // to memorize by rote
+            'लट', // lock of hair
+            'वट', // banyan tree
+            'हत', // killed / deprived of
+            'हित', // welfare / benefit
+            'क्षय', // decay / consumption
+            'शम', // peace / tranquility
+            'पथ', // path
+            'पट', // screen / cloth
+            'छह', // six
+            'नव', // nine / new
+
+            // Additions (three-letter words):
+            'अकड़', // stiffness / arrogance
+            'अचल', // still / mountain
+            'अटक', // to get stuck
+            'अमर', // immortal
+            'असर', // effect
+            'कलम', // pen
+            'कसम', // oath
+            'कदम', // step
+            'गरम', // hot
+            'शहर', // city
+            'नमक', // salt
+            'भजन', // devotional song
+            'कमल', // lotus
+            'मगर', // crocodile / but
+            'पहर', // period of three hours
+            'बटन', // button
+            'अकल', // intellect / wisdom
+            'गमन', // departure
+            'पहन', // to wear (root of पहनना)
+            'बरस', // year / to rain (root of बरसना)
+            'सरल', // simple / easy
+            'वचन', // word / promise
+            'हवन', // fire ritual
+            'रमन', // pleasing / delightful
+            'मगन', // engrossed / joyful
+            'भवन', // building
+            'शपथ', // oath
+            'वजन', // weight
+            'पवन', // air / wind
+            'जतन', // effort
+            'गगन', // sky
+            'लपक', // to snatch / to dart
+            'चमक', // shine / glitter
+            'ठहर', // to stop / to stay
+            'पहर', // watch (of time)
+            'कलश', // pitcher
+            'कपट', // deceit
+            'सदन', // house / abode
+            'चपल', // nimble / swift
+            'अमन', // peace
+            'नमन', // salutation
+            'पवन', // wind
+            'लखन', // a name, also refers to Lakshman
+            'गमन', // going / departure
+            'चमक', // shine
+            'वचन', // word / promise
+            'नमन', // bowing / salutation
+            'गमन', // going / movement
+            'अमन', // peace
+            'लगन', // dedication / auspicious moment
+            'पहन', // to wear
+            'रहन', // living / dwelling
+            'सहन', // endurance / bearing
+            'छल', // deceit
+            'हल', // plough / solution
+            'दल', // group / petal
+            'तल', // bottom
+            'चल', // walk
+            'कल', // tomorrow / yesterday
+            'पल', // moment
+            'बल', // strength
+            'जल', // water
+            'फल', // fruit
+            'कलम', // pen
+            'भगत', // devotee
+            'पवन', // wind
+            'शहर', // city
+            'नमक', // salt
+            'भजन', // hymn
+            'कमल', // lotus
+            'मगर', // crocodile
+            'पहर', // period of three hours
+            'बटन', // button
+            'अकल', // intellect
+            'गमन', // departure
+            'पहन', // to wear
+            'बरस', // year / rain
+            'सरल', // simple
+            'वचन', // word
+            'हवन', // fire ritual
+            'रमन', // delightful
+            'मगन', // engrossed
+            'भवन', // building
+            'शपथ', // oath
+            'वजन', // weight
+            'जतन', // effort
+            'गगन', // sky
+            'लपक', // to snatch
+            'चमक', // shine
+            'ठहर', // to stop
+            'कलश', // pitcher
+            'कपट', // deceit
+            'सदन', // house
+            'चपल', // swift
+            'अमन', // peace
+            'नमन', // salutation
+            'लखन', // a name
+            'लगन', // dedication
+            'रहन', // living
+            'सहन', // endurance
+            'डगर', // path
+            'कसर', // defect / deficiency
+            'महल', // palace
+            'खबर', // news
+            'पहर', // watch of day/night
+            'कमल', // lotus
+            'मगर', // but/crocodile
+            'पवन', // wind
+            'गगन', // sky
+            'चमन', // garden
+            'शरण', // refuge
+            'वतन', // homeland
+            'सदन', // house
+            'भवन', // building
+            'अमन', // peace
+            'कसम', // oath
+            'कदम', // step
+            'गरम', // hot
+            'महल', // palace
+            'सफर', // journey
+            'मसल', // to rub/crush
+            'पलक', // eyelid
+            'भरम', // illusion
+            'सफल', // successful
+            'अकड़', // stubbornness
+            'चमक', // shine
+            'बदल', // cloud / to change
+            'रगड', // to rub
+            'झलक', // glimpse
+            'पकड़', // to catch
+            'उछल', // to jump
+            'पहन', // to wear
+            'सड़क', // road
+            'चख', // to taste
+            'अपन', // own (as in अपना - apna)
+            'मचल', // to be restless
+            'डगर', // path
+            'शहर', // city
+            'असर', // effect
+            'मदद', // help
+            'पठक', // reader
+            'बचत', // saving
+            'भजन', // devotional song
+            'अजब', // strange
+            'गजब', // wonderful
+            'खटक', // to bother / to tick
+            'लहर', // wave
+            'कहर', // havoc
+            'नगर', // city
+            'रगड़', // to rub
+            'मलमल', // muslin
+            'धमक', // thump / threatening
+            'पलट', // to turn over
+            'कसर', // deficiency
+            'हवन', // fire ritual
+            'लगन', // dedication
+            'रहन', // living
+            'जतन', // effort
+            'टपक', // to drip
+            'मटक', // to sway
+            'नकल', // copy
+            'फसल', // crop
+            'शपथ', // oath
+            'अमल', // action / implementation
+            'पहल', // initiative
+            'बदल', // cloud / change
+            'सकल', // entire / all
+            'टहल', // to stroll
+            'टपक', // to drip
+            'मटक', // to sway
+            'रगड़', // to rub
+            'चटक', // to crack / bright
+            'पलट', // to turn over
+            'अचकन', // a type of long coat (might be too complex for "simple" but fits the rule)
+            'सजधज', // dressing up (compound word) - keeping for now
+            'झपट', // to snatch
+            'अकड़', // stiffness
+            'अकड़', // stiff / arrogant
+            'अचकन', // a type of coat
+            'अजल', // eternal
+            'अदब', // respect
+            'अटल', // firm / steadfast
+            'अधर', // lip / hanging
+            'अपन', // own (short for अपना)
+            'अमर', // immortal
+            'अमल', // practice / implementation
+            'अवर', // lower / inferior
+            'अवर', // inferior
+            'कथन', // statement
+            'कठिन', // difficult
+            'कठोर', // hard (though has 'o' sound, keeping for simplicity as it's common)
+            'कपट', // deceit
+            'कमल', // lotus
+            'कसम', // oath
+            'कसर', // deficiency
+            'कसक', // pang / uneasiness
+            'कहन', // saying
+            'कलश', // pitcher
+            'कहन', // saying
+            'अमर', // immortal
+            'अचकन', // a type of coat
+            'अजगर', // python
+            'अटक', // to get stuck
+            'अटल', // firm
+            'अदल', // justice
+            'अदम', // last
+            'अदल', // exchange
+            'अजय', // invincible
+            'अदल', // justice
+            'अदम', // last
+            'अटल', // firm
+            'अवर', // lower
+            'असर', // effect
+            'अकड़', // stiffness
+            'अटल', // firm
+            'अगर', // if
+            'अजगर', // python
+            'अदब', // respect
+            'अदब', // respect
+            'असम', // unequal / Assam
+            'कहन', // saying
+            'कठिन', // difficult
+            'कठोर', // hard
+            'कसक', // pang
+            'कसम', // oath
+            'कसर', // deficiency
+            'कसर', // defect
+            'कलश', // pitcher
+            'कपट', // deceit
+            'कमल', // lotus
+            'कहत', // saying
+            'अमल', // action
+            'अमन', // peace
+            'अदब', // respect
+            'अजगर', // python
+            'अवर', // lower
+            'अवल', // first
+            'कथन', // statement
+            'कठिन', // difficult
+            'कठोर', // hard
+            'कमर', // waist
+            'कसर', // deficiency
+            'कसम', // oath
+            'अमल', // practice
+            'अमन', // peace
+            'अटक', // to get stuck
+            'अमर', // immortal
+            'असर', // effect
+            'अजब', // strange
+            'गजब', // wonderful
+            'खटक', // to bother
+            'लहर', // wave
+            'कहर', // havoc
+            'नगर', // city
+            'रगड़', // to rub
+            'धमक', // thump
+            'पलट', // to turn over
+            'अचकन', // a type of coat
+            'सजधज', // dressing up
+            'झपट', // to snatch
+            'पहन', // to wear
+            'सड़क', // road
+            'मचल', // to be restless
+            'डगर', // path
+            'शहर', // city
+            'मदद', // help
+            'पठक', // reader
+            'बचत', // saving
+            'नकल', // copy
+            'फसल', // crop
+            'शपथ', // oath
+            'पहल', // initiative
+            'बदल', // cloud/change
+            'सकल', // entire
+            'टहल', // to stroll
+            'टपक', // to drip
+            'मटक', // to sway
+            'चटक', // bright
+            'झलक', // glimpse
+            'पकड़', // to catch
+            'उछल', // to jump
+            'भरम', // illusion
+            'सफल', // successful
+            'पलक', // eyelid
+            'कठिन', // difficult
+            'मसल', // to rub
+            'अदब', // respect
+            'अजर', // ageless
+            'अजल', // eternal
+            'अदब', // respect
+            'अचल', // steady
+            'अपन', // own
+            'जतन', // effort
+            'अमर', // immortal
+            'असर', // effect
+            'अदब', // respect
+            'अदल', // exchange
+            'अदम', // last
+            'कसर', // defect
+            'कसम', // oath
+            'मगन', // engrossed
+            'अजय', // invincible
+            'अचल', // motionless
+            'अगर', // if
+            'अदब', // respect
+            'अमन', // peace
+            'असर', // effect
+            'अकड़', // stiffness
+            'अटल', // firm
+            'अवर', // lower
+            'अमल', // action
+            'अमर', // immortal
+            'अजगर', // python
+            'कलश', // pitcher
+            'कपट', // deceit
+            'कमल', // lotus
+            'कसक', // pang
+            'कसम', // oath
+            'कसर', // deficiency
+            'कहन', // saying
+            'कथन', // statement
+            'कठिन', // difficult
+            'कठोर', // hard
+            'गमन', // departure
+            'गरम', // hot
+            'गबन', // embezzlement
+            'चख', // to taste
+            'चलन', // conduct / currency
+            'चमक', // shine
+            'चपल', // swift
+            'चटक', // bright
+            'जतन', // effort
+            'जलन', // burning / jealousy
+            'झटक', // to snatch
+            'झलक', // glimpse
+            'झपट', // to snatch
+            'नकल', // copy
+            'नमन', // salutation
+            'नगर', // city
+            'पटक', // to throw down
+            'पवन', // wind
+            'पहन', // to wear
+            'पलट', // to turn over
+            'पकड़', // to catch
+            'पहल', // initiative
+            'बचत', // saving
+            'बदल', // cloud / to change
+            'बटन', // button
+            'भजन', // devotional song
+            'भवन', // building
+            'मटक', // to sway
+            'मदद', // help
+            'मगन', // engrossed
+            'मसल', // to rub
+            'नमक', // salt
+            'रगड', // to rub
+            'रहन', // living
+            'शपथ', // oath
+            'शहर', // city
+            'सफर', // journey
+            'सदन', // house
+            'सफल', // successful
+            'सहन', // endurance
+            'सड़क', // road
+            'सरल', // simple
+            'हलचल', // commotion
+            'हवन', // fire ritual
+            'अटक', // to get stuck
+            'अजय', // invincible
+            'अदब', // respect
+            'अटल', // firm
+            'अगर', // if
+            'अचकन', // a type of coat
+            'अजल', // eternal
+            'अजर', // ageless
+            'अमन', // peace
+            'अमल', // action
+            'असर', // effect
+            'कलम', // pen
+            'गगन', // sky
+            'गमन', // departure
+            'गरम', // hot
+            'चमन', // garden
+            'चमक', // shine
+            'जतन', // effort
+            'नकल', // copy
+            'नमन', // salutation
+            'नगर', // city
+            'पटक', // to throw down
+            'पवन', // wind
+            'पहन', // to wear
+            'पलट', // to turn over
+            'पकड़', // to catch
+            'फसल', // crop
+            'बटन', // button
+            'भजन', // devotional song
+            'भवन', // building
+            'मगन', // engrossed
+            'मदद', // help
+            'मसल', // to rub
+            'रगड़', // to rub
+            'लहर', // wave
+            'वचन', // word
+            'वजन', // weight
+            'शहर', // city
+            'सफर', // journey
+            'सदन', // house
+            'सफल', // successful
+            'सहन', // endurance
+            'हवन', // fire ritual
+            'बचत', // saving
+            'बदल', // cloud/change
+            'डगर', // path
+            'छल', // deceit
+            'हल', // plough/solution
+            'दल', // group/petal
+            'तल', // bottom
+            'चल', // walk
+            'कल', // tomorrow/yesterday
+            'पल', // moment
+            'बल', // strength
+            'जल', // water
+            'फल', // fruit
+            'दब', // to press
+            'छप', // to print
+            'तब', // then
+            'जब', // when
+            'कब', // when (interrogative)
+            'लंब', // long (root, as in लंबा)
+            'गद', // mace (like in गदा)
+            'गज', // elephant
+            'गज', // unit of measurement
+            'जग', // world / pitcher
+            'जप', // to chant
+            'तप', // penance
+            'दम', // breath
+            'ढक', // to cover
+            'ठक', // sound of knocking
+            'तन', // body
+            'पन', // as a suffix (e.g., बचपन)
+            'पट', // screen / cloth
+            'छत', // roof
+            'खत', // letter
+            'घन', // dense / cloud
+            'छन', // to filter
+            'धड़', // thump
+            'छल', // deceit
+            'हल', // plow
+            'तल', // bottom
+            'दल', // group
+            'नल', // tap
+            'नभ', // sky
+            'रथ', // chariot
+            'पथ', // path
+            'सर', // head / lake
+            'कर', // to do / tax
+            'डर', // fear
+            'पर', // on / feather
+            'भर', // to fill
+            'हर', // every / Lord Shiva
+            'वर', // boon / groom
+            'यश', // fame
+            'रस', // juice
+            'बस', // bus / enough
+            'दस', // ten
+            'छह', // six
+            'नव', // nine
+            'शत', // hundred
+            'सब', // all
+            'कब', // when
+            'तब', // then
+            'जब', // when
+            'सब', // all
+            'आठ', // eight
+            'एक', // one
+            'ईख', // sugarcane
+            'ऊन', // wool
+            'अंक', // number
+            'अंश', // part
+            'अर्थ', // meaning
+            'उप', // sub / near
+            'ऋण', // debt
+            'ओर', // direction
+            'कण', // particle
+            'कठ', // hard (root)
+            'खल', // wicked
+            'गज़', // elephant
+            'टन', // ton
+            'तर', // wet (root)
+            'दह', // ten (as in दहकना - to glow)
+            'धज', // pomp / style
+            'नव', // new / nine
+            'पथ', // path
+            'बन', // forest
+            'मल', // dirt
+            'रट', // rote
+            'लट', // lock of hair
+            'वन', // forest
+            'शत', // hundred
+            'षट', // six (less common than छह)
+            'हल', // solution / plow
+            'हित', // welfare
+            'छल', // deceit
+            'जप', // chant
+            'टक', // stare
+            'तप', // penance
+            'डर', // fear
+            'दम', // breath
+            'धन', // wealth
+            'नभ', // sky
+            'पढ़', // read
+            'फल', // fruit
+            'बल', // strength
+            'भर', // fill
+            'मत', // opinion / don't
+            'यश', // fame
+            'रथ', // chariot
+            'वद', // to speak (root)
+            'वन', // forest
+            'शम', // peace
+            'सब', // all
+            'सर', // head
+            'हत', // killed
+            'अक्ष', // axis
+            'अन्न', // grain (though double n, often written simply)
+            'अब्ज', // lotus
+            'अब्ज', // lotus
+            'अक्ष', // axis
+            'अक्ष', // axis
+            'अदब', // respect
+            'अधर', // lip
+            'अमन', // peace
+            'अमर', // immortal
+            'असर', // effect
+            'अकल', // intellect
+            'अकड़', // stiffness
+            'अचल', // still
+            'अटक', // to get stuck
+            'अटल', // firm
+            'अवज', // voice (less common, usually आवाज़)
+            'अवन', // earth (poetic)
+            'अवल', // first
+            'कथन', // statement
+            'कदम', // step
+            'कनक', // gold
+            'कसम', // oath
+            'कसर', // deficiency
+            'कसक', // pang
+            'कहन', // saying
+            'कलश', // pitcher
+            'कपट', // deceit
+            'कमल', // lotus
+            'करन', // doing / a name
+            'गगन', // sky
+            'गमन', // departure
+            'गरम', // hot
+            'गबन', // embezzlement
+            'घटन', // event / to decrease
+            'चमक', // shine
+            'चमन', // garden
+            'चपल', // swift
+            'चटक', // bright
+            'जतन', // effort
+            'जलन', // burning
+            'झटक', // to snatch
+            'झलक', // glimpse
+            'झपट', // to snatch
+            'ठग', // cheat
+            'ठहर', // to stop
+            'डगर', // path
+            'ढलक', // to spill
+            'तपन', // heat
+            'दमक', // sparkle
+            'धमक', // thump
+            'धड़क', // heartbeat
+            'नकल', // copy
+            'नमन', // salutation
+            'नगर', // city
+            'पटक', // to throw
+            'पवन', // wind
+            'पहन', // to wear
+            'पलट', // to turn
+            'पकड़', // to catch
+            'फसल', // crop
+            'बटन', // button
+            'बचत', // saving
+            'बदल', // cloud / change
+            'भगत', // devotee
+            'भजन', // devotional song
+            'भवन', // building
+            'मटक', // to sway
+            'मदद', // help
+            'मगन', // engrossed
+            'मसल', // to rub
+            'महल', // palace
+            'नमक', // salt
+            'रगड़', // to rub
+            'रहन', // living
+            'लपक', // to snatch
+            'लहर', // wave
+            'वचन', // word
+            'वजन', // weight
+            'शपथ', // oath
+            'शमन', // suppression
+            'शहर', // city
+            'सफर', // journey
+            'सदन', // house
+            'सफल', // successful
+            'सहन', // endurance
+            'सड़क', // road
+            'सरल', // simple
+            'हवन', // fire ritual
+            'हलचल', // commotion
+            'हवन', // fire ritual
+            'गठन', // formation
+            'भटक', // to wander
+            'अजय', // invincible
+            'अधर', // lip
+            'अमर', // immortal
+            'अमल', // action
+            'असर', // effect
+            'अकड़', // stiffness
+            'अचल', // still
+            'अटक', // to get stuck
+            'अटल', // firm
+            'अदब', // respect
+            'अगर', // if
+            'अजगर', // python
+            'अवल', // first
+            'कथन', // statement
+            'कदम', // step
+            'कनक', // gold
+            'कसम', // oath
+            'कसर', // deficiency
+            'कसक', // pang
+            'कहन', // saying
+            'कलश', // pitcher
+            'कपट', // deceit
+            'कमल', // lotus
+            'करन', // doing / a name
+            'गगन', // sky
+            'गमन', // departure
+            'गरम', // hot
+            'चमक', // shine
+            'चमन', // garden
+            'चपल', // swift
+            'जतन', // effort
+            'जलन', // burning
+            'झटक', // to snatch
+            'झलक', // glimpse
+            'झपट', // to snatch
+            'नकल', // copy
+            'नमन', // salutation
+            'नगर', // city
+            'पटक', // to throw
+            'पवन', // wind
+            'पहन', // to wear
+            'पलट', // to turn
+            'पकड़', // to catch
+            'फसल', // crop
+            'बटन', // button
+            'बचत', // saving
+            'बदल', // cloud / change
+            'भगत', // devotee
+            'भजन', // devotional song
+            'भवन', // building
+            'मटक', // to sway
+            'मदद', // help
+            'मगन', // engrossed
+            'मसल', // to rub
+            'महल', // palace
+            'नमक', // salt
+            'रगड़', // to rub
+            'रहन', // living
+            'लपक', // to snatch
+            'लहर', // wave
+            'वचन', // word
+            'वजन', // weight
+            'शपथ', // oath
+            'शहर', // city
+            'सफर', // journey
+            'सदन', // house
+            'सफल', // successful
+            'सहन', // endurance
+            'सड़क', // road
+            'सरल', // simple
+            'हवन', // fire ritual
+            'हलचल', // commotion
+            'अजल', // eternal
+            'अजर', // ageless
+            'अदल', // exchange
+            'अधम', // lowest
+            'अगम', // inaccessible
+            'अचर', // non-moving
+            'अवल', // first
+            'ईंधन', // fuel (though sounds like it has matra, it's a common 'simple' word)
+            'ओखल', // mortar
+            'ओझल', // hidden
+            'उड़न', // flying (root of उड़ना)
+            'उलट', // to turn over
+            'कतर', // to cut
+            'कपट', // deceit
+            'कमर', // waist
+            'करण', // doing / instrument
+            'खतर', // danger (short for खतरा)
+            'गहन', // deep
+            'घटन', // event
+            'चलन', // conduct
+            'छल', // deceit
+            'जड़न', // setting / embedding
+            'झटक', // to snatch
+            'डगमग', // wavering
+            'डबल', // double (English word, common in Hindi)
+            'तड़प', // to yearn
+            'धवन', // running (root)
+            'नगर', // city
+            'पतन', // fall
+            'पलक', // eyelid
+            'फटक', // to winnow
+            'बकबक', // chatter
+            'बदल', // cloud
+            'भटक', // to wander
+            'मटक', // to sway
+            'मदद', // help
+            'रतन', // gem
+            'रपट', // slip / report
+            'लटक', // to hang
+            'लपट', // flame
+            'समर', // battle
+            'सजल', // full of water
+            'सड़क', // road
+            'सहज', // easy
+            'हड़प', // to usurp
+            'मठ', // monastery
+            'रट', // rote memorization
+            'ढब', // way / manner
+            'ढक', // to cover
+            'चख', // to taste
+            'अड़', // to obstruct
+            'बढ़', // to grow
+            'गढ़', // fort
+            'खग', // bird
+            'जड़', // root / inert
+            'लड़', // to fight
+            'पढ़', // to read
+            'छड़', // rod
+            'कठ', // hard
+            'उड़', // to fly
+            'अध', // half
+            'ऋत', // truth / order
+            'एक', // one
+            'ओर', // direction
+            'ओस', // dew
+            'कण', // particle
+            'खल', // rogue
+            'गज़', // elephant
+            'टन', // ton
+            'तर', // wet
+            'दब', // press
+            'धज', // pomp
+            'पट', // screen
+            'फन', // snake hood
+            'बद', // bad (as in बदनाम)
+            'भय', // fear
+            'मन', // mind
+            'रट', // rote
+            'लट', // lock
+            'वन', // forest
+            'शत', // hundred
+            'सब', // all
+            'हठ', // stubbornness
+            'चढ़', // to climb
+            'अँग', // limb (अंग - a bit of a stretch for no matra, but common simple sound)
+            'छद', // cover
+            'तरन', // swimming / crossing
+            'नमन', // salutation
+            'पतन', // fall
+            'रटन', // rote learning
+            'सदन', // house
+            'समन', // equal
+            'उड़न', // flying
+            'अधर', // lip
+            'अमल', // action
+            'असर', // effect
+            'कलम', // pen
+            'गगन', // sky
+            'गरम', // hot
+            'चमन', // garden
+            'चमक', // shine
+            'जतन', // effort
+            'नकल', // copy
+            'नगर', // city
+            'पटक', // to throw
+            'पवन', // wind
+            'पहन', // to wear
+            'पलट', // to turn
+            'पकड़', // to catch
+            'फसल', // crop
+            'बटन', // button
+            'भजन', // devotional song
+            'भवन', // building
+            'मगन', // engrossed
+            'मदद', // help
+            'मसल', // to rub
+            'रगड़', // to rub
+            'लहर', // wave
+            'वचन', // word
+            'वजन', // weight
+            'शपथ', // oath
+            'शहर', // city
+            'सफर', // journey
+            'सदन', // house
+            'सफल', // successful
+            'सहन', // endurance
+            'हवन', // fire ritual
+            'बचत', // saving
+            'बदल', // cloud/change
+            'डगर', // path
+            'टपक', // to drip
+            'मटक', // to sway
+            'चटक', // bright
+            'झलक', // glimpse
+            'अकड़', // stiffness
+            'अचपल', // restless
+            'अदब', // respect
+            'अधर', // lip
+            'अमन', // peace
+            'अमर', // immortal
+            'असर', // effect
+            'अकल', // intellect
+            'अचर', // non-moving
+            'अजल', // eternal
+            'अजर', // ageless
+            'अटल', // firm
+            'अगर', // if
+            'अजगर', // python
+            'अवज', // voice
+            'अवन', // earth
+            'अवल', // first
+            'कथन', // statement
+            'कदम', // step
+            'कनक', // gold
+            'कसम', // oath
+            'कसर', // deficiency
+            'कसक', // pang
+            'कहन', // saying
+            'कलश', // pitcher
+            'कपट', // deceit
+            'कमल', // lotus
+            'करन', // doing / a name
+            'गगन', // sky
+            'गमन', // departure
+            'गरम', // hot
+            'गबन', // embezzlement
+            'घटन', // event
+            'चमक', // shine
+            'चमन', // garden
+            'चपल', // swift
+            'चटक', // bright
+            'जतन', // effort
+            'जलन', // burning
+            'झटक', // to snatch
+            'झलक', // glimpse
+            'झपट', // to snatch
+            'ढलक', // to spill
+            'तपन', // heat
+            'दमक', // sparkle
+            'धमक', // thump
+            'धड़क', // heartbeat
+            'नकल', // copy
+            'नमन', // salutation
+            'नगर', // city
+            'पटक', // to throw
+            'पवन', // wind
+            'पहन', // to wear
+            'पलट', // to turn
+            'पकड़', // to catch
+            'फसल', // crop
+            'बटन', // button
+            'बचत', // saving
+            'बदल', // cloud / change
+            'भगत', // devotee
+            'भजन', // devotional song
+            'भवन', // building
+            'मटक', // to sway
+            'मदद', // help
+            'मगन', // engrossed
+            'मसल', // to rub
+            'महल', // palace
+            'नमक', // salt
+            'रगड़', // to rub
+            'रहन', // living
+            'लपक', // to snatch
+            'लहर', // wave
+            'वचन', // word
+            'वजन', // weight
+            'शपथ', // oath
+            'शमन', // suppression
+            'शहर', // city
+            'सफर', // journey
+            'सदन', // house
+            'सफल', // successful
+            'सहन', // endurance
+            'सड़क', // road
+            'सरल', // simple
+            'हवन', // fire ritual
+            'हलचल', // commotion
+            'कसर', // defect
+            'कलश', // pitcher
+            'सबल', // strong
+            'सफर', // journey
+            'सरस', // juicy / delightful
+            'हड़प', // to usurp
+            'पतन', // fall
+            'अपन', // own (as in अपना)
+            'मचल', // to be restless
+            'डगर', // path
+            'शहर', // city
+            'मदद', // help
+            'पठक', // reader
+            'बचत', // saving
+            'नकल', // copy
+            'फसल', // crop
+            'पहल', // initiative
+            'बदल', // cloud/change
+            'सकल', // entire
+            'टहल', // to stroll
+            'झलक', // glimpse
+            'पकड़', // to catch
+            'उछल', // to jump
+            'भरम', // illusion
+            'सफल', // successful
+            'पलक', // eyelid
+            'मसल', // to rub
+            'अदब', // respect
+            'अजर', // ageless
+            'अजल', // eternal
+            'अदल', // exchange
+            'अदम', // last
+            'मगन', // engrossed
+            'गमन', // departure
+            'गठन', // formation
+            'चलन', // conduct
+            'जड़न', // setting
+            'ठग', // cheat
+            'तड़प', // to yearn
+            'धवन', // running
+            'पट', // screen
+            'फटक', // to winnow
+            'बकबक', // chatter
+            'भटक', // to wander
+            'मठ', // monastery
+            'रटन', // rote learning
+            'रपट', // slip
+            'लटक', // to hang
+            'लपट', // flame
+            'समर', // battle
+            'सजल', // watery
+            'सहज', // easy
+            'हड़प', // to usurp
+            'ढब', // manner
+            'कण', // particle
+            'कठ', // hard
+            'खल', // rogue
+            'गज़', // elephant
+            'टन', // ton
+            'तर', // wet
+            'दब', // press
+            'धज', // pomp
+            'फन', // snake hood
+            'बद', // bad
+            'भय', // fear
+            'रट', // rote
+            'लट', // lock
+            'शम', // peace
+            'छद', // cover
+            'चढ़', // to climb
+            'अड़', // to obstruct
+            'बढ़', // to grow
+            'गढ़', // fort
+            'छड़', // rod
+            'उड़', // to fly
+            'अध', // half
+            'ऋत', // truth
+            'ओस', // dew
+            'ऊन', // wool
+            'अंक', // number
+            'अंश', // part
+            'अर्थ', // meaning
+            'उप', // near
+            'ऋण', // debt
+            'तड़', // crack
+            'धड़', // thump
+            'नभ', // sky
+            'पलक', // eyelid
+            'पथ', // path
+            'रख', // to keep
+            'गज', // elephant
+            'जग', // world / pitcher
+            'झट', // quickly
+            'रथ', // chariot
+            'वश', // control
+            'हत', // killed
+            'एक', // one
+            'रस', // juice
+            'बस', // enough / bus
+            'दस', // ten
+            'छह', // six
+            'नव', // nine
+            'शत', // hundred
+            'सब', // all
+            'तब', // then
+            'जब', // when
+            'कब', // when (interrogative)
+            'छत', // roof
+            'खत', // letter
+            'घन', // dense / cloud
+            'छन', // to filter
+            'तन', // body
+            'पन', // suffix
+            'हल', // plow / solution
+            'पर', // on
+            'कर', // do / tax
+            'डर', // fear
+            'भर', // fill
+            'मर', // die
+            'नर', // man
+            'वर', // boon
+            'यश', // fame
+            'अंक', // number
+            'अंश', // part
+            'उप', // sub
+            'कण', // particle
+            'पल', // moment
+            'दल', // group
+            'तल', // bottom
+            'जल', // water
+            'बल', // strength
+            'फल', // fruit
+            'मल', // dirt
+            'नल', // tap
+            'वन', // forest
+            'चख', // to taste
+            'आग', // fire
+            'ईख', // sugarcane
+            'जड़', // root
+            'लड़', // to fight
+            'पढ़', // to read
+            'आठ', // eight
+            'उठ', // to get up
+            'कद', // height
+            'कई', // several
+            'खग', // bird
+            'गद', // mace
+            'छप', // to print
+            'तब', // then
+            'दम', // breath
+            'टब', // tub
+            'टस', // to budge
+            'टप', // drip (sound)
+            'तप', // penance
+            'ढक', // to cover
+            'ठक', // knock (sound)
+            'थक', // to tire
+            'दब', // to press
+            'नभ', // sky
+            'रट', // rote
+            'लट', // lock of hair
+            'लट', // lock of hair
+            'छम', // sound of anklets (often repeated)
+            'जम', // to freeze
+            'पट', // screen
+            'लट', // lock of hair
+            'घस', // to rub
+            'भट', // soldier
+            'ठस', // stubborn
+            'मठ', // monastery
+            'गद', // mace
+            'ढब', // manner
+            'छद', // cover
+            'चढ़', // to climb
+            'अड़', // to obstruct
+            'बढ़', // to grow
+            'गढ़', // fort
+            'छड़', // rod
+            'उड़', // to fly
+            'अध', // half
+            'ओस', // dew
+            'ऊन', // wool
+            'ऋण', // debt
+            'खल', // rogue
+            'धज', // pomp
+            'बद', // bad
+            'भय', // fear
+            'हठ', // stubbornness
+            'जग', // world
+            'जप', // chant
+            'टक', // stare
+            'थक', // tire
+            'धड़', // thump
+            'धड़', // thump
+            'पन', // suffix for abstract noun
+            'भय', // fear
+            'झग', // fight (root of झगड़ना)
+            'फन', // snake hood
+            'रट', // rote
+            'वश', // control
+            'खट', // sour
+            'पग', // step / foot
+            'मग', // brain / path
+            'नग', // gem
+            'टम', // *This word is generally not a standalone meaningful Hindi word without matras. Removing.*
+            'टब', // tub (English) - *removing for strict adherence.*
+            'झट', // quickly
+            'चट', // quickly (often with matra) - *removing for strict adherence.*
+            'अवन', // *removing, poetic and less common.*
+            'चलन', // conduct
+            'पतन', // fall
+            'रटन', // rote learning
+            'समन', // equal
+            'उड़न', // flying
+            'तड़प', // to yearn
+            'धवन', // running
+            'रतन', // gem
+            'रपट', // slip/report
+            'लटक', // to hang
+            'लपट', // flame
+            'समर', // battle
+            'सजल', // watery
+            'सहज', // easy
+            'हड़प', // to usurp
+            'गठन', // formation
+            'अगम', // inaccessible
+            'अचर', // non-moving
+            'अधम', // lowest
+            'ईंधन', // fuel (has matra) - *removing for strict adherence.*
+            'ओखल', // mortar (has matra) - *removing for strict adherence.*
+            'ओझल', // hidden (has matra) - *removing for strict adherence.*
+            'कतर', // to cut
+            'घटन', // event
+            'जड़न', // setting
+            'छल', // deceit
+            'सबल', // strong
+            'सरस' // juicy
         ];
 
         let mode = 'letter'; // default mode
@@ -195,6 +1547,7 @@
             display.innerText = simpleWords[randomIndex];
         }
 
+
         function handleBoxClick() {
             if (mode === 'letter') {
                 showRandomLetter();
@@ -213,8 +1566,223 @@
                 handleBoxClick();
             }
         });
+        window.onload = function () {
+            if (!localStorage.getItem('demoSeen')) {
+                startDemo();
+                localStorage.setItem('demoSeen', 'true');
+            }
+        };
+
+        function startDemo() {
+            if (demoActive) {
+                console.log('Demo is already running, ignoring click.');
+                return;
+            }
+            demoActive = true;
+
+            const steps = [
+                {
+                    elementId: 'letterBtn',
+                    message: 'यहाँ क्लिक करके आप नया अक्षर देख सकते हैं।',
+                    action: () => setMode('letter')
+                },
+                {
+                    elementId: 'wordBtn',
+                    message: 'अब इस बटन से नया शब्द देखिए।',
+                    action: () => setMode('word')
+                },
+                {
+                    elementId: 'comboBtn',
+                    message: 'अब अक्षरों का मेल देखिए।',
+                    action: () => setMode('combo')
+                },
+                {
+                    elementId: null,
+                    message: 'अब आप क्लिक करके या Enter दबाकर इस्तेमाल कर सकते हैं!',
+                    action: () => { }
+                }
+            ];
+
+            let currentStep = 0;
+            const overlay = document.getElementById('demoOverlayMask');
+            overlay.style.display = 'block';
+
+            const demoBox = document.createElement('div');
+            demoBox.id = 'demoStepBox';
+            demoBox.style.position = 'fixed';
+            demoBox.style.bottom = '150px';
+            demoBox.style.left = '50%';
+            demoBox.style.transform = 'translateX(-50%)';
+            demoBox.style.background = '#fff8e1';
+            demoBox.style.padding = '15px 25px';
+            demoBox.style.borderRadius = '12px';
+            demoBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            demoBox.style.fontSize = '1.1em';
+            demoBox.style.color = '#4A148C';
+            demoBox.style.zIndex = '1002';
+
+            const messageEl = document.createElement('div');
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next ➡️';
+            nextBtn.style.marginTop = '10px';
+            nextBtn.style.fontSize = '1em';
+            nextBtn.style.padding = '8px 20px';
+            nextBtn.style.border = 'none';
+            nextBtn.style.borderRadius = '8px';
+            nextBtn.style.backgroundColor = '#FF9800';
+            nextBtn.style.color = 'white';
+            nextBtn.style.cursor = 'pointer';
+
+            nextBtn.onclick = () => nextStep();
+
+            demoBox.appendChild(messageEl);
+            demoBox.appendChild(nextBtn);
+            document.body.appendChild(demoBox);
+
+            function nextStep() {
+                document.querySelectorAll('.demo-highlight').forEach(el => el.classList.remove('demo-highlight'));
+
+                const step = steps[currentStep];
+                messageEl.innerText = step.message;
+
+                if (step.elementId) {
+                    const element = document.getElementById(step.elementId);
+                    element.classList.add('demo-highlight');
+                    step.action();
+                }
+
+                currentStep++;
+
+                if (currentStep >= steps.length) {
+                    nextBtn.textContent = 'समाप्त';
+                    nextBtn.onclick = () => {
+                        overlay.style.display = 'none';
+                        document.body.removeChild(demoBox);
+                        document.querySelectorAll('.demo-highlight').forEach(el => el.classList.remove('demo-highlight'));
+                        demoActive = false; // ✅ Reset flag to allow re-clicking later
+                    };
+                }
+            }
+
+            nextStep(); // Start with the first step
+        }
+
+
+        document.getElementById('demoButton').addEventListener('click', () => {
+            if (demoActive) return;  // Demo already running, ignore clicks
+
+            demoActive = true;       // Mark demo as active
+
+            // Your demo box creation or showing code here
+            showDemoBox();
+
+            // Example: Automatically hide demo after some time or on user action
+            setTimeout(() => {
+                hideDemoBox();
+                demoActive = false;   // Reset flag after demo ends
+            }, 10000); // 10 seconds demo duration, adjust as needed
+        });
+
+        // Functions to show/hide demo box
+
+        function showDemoBox() {
+            // Check if demo box exists already
+            let demoBox = document.getElementById('demoBox');
+            if (!demoBox) {
+                demoBox = document.createElement('div');
+                demoBox.id = 'demoBox';
+                demoBox.style = `
+      position: fixed;
+      bottom: 90px;
+      right: 30px;
+      width: 200px;
+      height: 200px;
+      background-color: white;
+      border: 1px solid #ddd;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      padding: 20px;
+    `;
+                demoBox.textContent = 'Demo Content Here...';
+                document.body.appendChild(demoBox);
+            }
+            demoBox.style.display = 'block';
+        }
+
+        function hideDemoBox() {
+            const demoBox = document.getElementById('demoBox');
+            if (demoBox) {
+                demoBox.style.display = 'none';
+            }
+        }
 
     </script>
+
+    <div id="demoOverlayMask"></div>
+    <script>
+        (function () {
+            const banner = document.getElementById('devBanner');
+
+            function showBanner() {
+                const banner = document.getElementById('devBanner');
+                if (!banner) return;
+
+                banner.style.display = 'block';
+                banner.style.opacity = '1';
+
+                // Start fading out slowly over 5 seconds
+                setTimeout(() => {
+                    banner.style.opacity = '0';
+                }, 300); // Slight delay for instant visibility, then fade
+
+                // Hide it fully after fade completes
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 5300); // 300ms delay + 5s fade-out
+            }
+
+
+
+            // --- Mobile Shake Detection ---
+            let lastShakeTime = 0;
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', (event) => {
+                    const acc = event.accelerationIncludingGravity;
+                    const threshold = 15;
+                    const now = Date.now();
+
+                    if (acc && (Math.abs(acc.x) > threshold || Math.abs(acc.y) > threshold || Math.abs(acc.z) > threshold)) {
+                        if (now - lastShakeTime > 3000) {
+                            lastShakeTime = now;
+                            showBanner();
+                        }
+                    }
+                });
+            }
+
+            // --- Desktop: Mouse Shake Detection ---
+            let lastMove = 0;
+            let movementCount = 0;
+
+            window.addEventListener('mousemove', () => {
+                const now = performance.now();
+                if (now - lastMove < 50) {
+                    movementCount++;
+                } else {
+                    movementCount = 0;
+                }
+
+                if (movementCount > 20) {
+                    movementCount = 0;
+                    showBanner();
+                }
+
+                lastMove = now;
+            });
+        })();
+    </script>
+
+
 
 </body>
 

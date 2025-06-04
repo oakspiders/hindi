@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>मस्तीभरा हिंदी अक्षर और शब्द जनरेटर</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            background: linear-gradient(to bottom, #FFFAF0, #FDEBD0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #FF5722;
+            margin-top: 20px;
+            text-shadow: 1px 1px #FFDAB9;
+        }
+
+        #display {
+            font-size: 18vw;
+            color: #4A148C;
+            background-color: #FFF3E0;
+            border: 6px dashed #FF9800;
+            border-radius: 20px;
+            width: 80vw;
+            height: 55vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            font-size: 1.5em;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        button.active {
+            background-color: #FF9800;
+        }
+
+        button:hover {
+            background-color: #388E3C;
+        }
+
+        @media (max-width: 768px) {
+            #display {
+                font-size: 30vw;
+                width: 90vw;
+                height: 30vh;
+            }
+
+            button {
+                font-size: 1.2em;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body onclick="handleBoxClick()">
+
+    <h1>🎉 मस्तीभरा हिंदी सीखें 🎉</h1>
+
+    <div id="display">अ</div>
+
+    <div class="button-container">
+        <button id="letterBtn" class="active" onclick="setMode('letter')">🔤 अगला अक्षर</button>
+        <button id="wordBtn" onclick="setMode('word')">🧠 अगला शब्द</button>
+    </div>
+
+    <script>
+        const hindiLetters = ['अ', 'आ', 'इ', 'ई', 'उ', 'ए', 'ओ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह'];
+
+        const simpleWords = [
+            'घर', 'कम', 'नल', 'पन', 'मन', 'बस', 'रस', 'मद', 'धन', 'पल', 'बन', 'खग', 'रथ', 'जम', 'खट', 'पथ',
+            'वन', 'तन', 'धन', 'लक', 'सप', 'डब', 'ठग', 'घस', 'जग', 'दम', 'मल', 'दस', 'रज', 'फन',
+            'बच', 'टक', 'गज', 'बल', 'खल', 'छल', 'ढल', 'थल', 'गण', 'धम', 'पक', 'नर', 'गर', 'भट', 'टम',
+            'सज', 'नथ', 'झग', 'ठस', 'झट', 'मठ', 'कन', 'फक'
+        ];
+
+        let mode = 'letter'; // default mode
+
+        function setMode(selectedMode) {
+            mode = selectedMode;
+            document.getElementById('letterBtn').classList.remove('active');
+            document.getElementById('wordBtn').classList.remove('active');
+
+            if (mode === 'letter') {
+                document.getElementById('letterBtn').classList.add('active');
+                showRandomLetter();
+            } else {
+                document.getElementById('wordBtn').classList.add('active');
+                showRandomWord();
+            }
+        }
+
+        function showRandomLetter() {
+            const randomIndex = Math.floor(Math.random() * hindiLetters.length);
+            document.getElementById('display').innerText = hindiLetters[randomIndex];
+        }
+
+        function showRandomWord() {
+            const randomIndex = Math.floor(Math.random() * simpleWords.length);
+            document.getElementById('display').innerText = simpleWords[randomIndex];
+        }
+
+        function handleBoxClick() {
+            if (mode === 'letter') {
+                showRandomLetter();
+            } else {
+                showRandomWord();
+            }
+        }
+    </script>
+
+</body>
+
+</html>

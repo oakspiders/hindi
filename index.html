@@ -75,6 +75,12 @@
             background-color: #388E3C;
         }
 
+        #display.small {
+            font-size: 10vw;
+            line-height: 1.2;
+        }
+
+
         @media (max-width: 768px) {
             #display {
                 font-size: 30vw;
@@ -97,9 +103,12 @@
     <div id="display">अ</div>
 
     <div class="button-container">
-        <button id="letterBtn" class="active" onclick="setMode('letter')">🔤 अगला अक्षर</button>
-        <button id="wordBtn" onclick="setMode('word')">🧠 अगला शब्द</button>
+        <button id="letterBtn" class="active" onclick="event.stopPropagation(); setMode('letter')">🔤 अगला
+            अक्षर</button>
+        <button id="wordBtn" onclick="event.stopPropagation(); setMode('word')">🧠 अगला शब्द</button>
+        <button id="comboBtn" onclick="event.stopPropagation(); setMode('combo')">🔠 अक्षरों का मेल</button>
     </div>
+
 
     <script>
         const hindiLetters = ['अ', 'आ', 'इ', 'ई', 'उ', 'ए', 'ओ', 'क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह'];
@@ -108,7 +117,12 @@
             'घर', 'कम', 'नल', 'पन', 'मन', 'बस', 'रस', 'मद', 'धन', 'पल', 'बन', 'खग', 'रथ', 'जम', 'खट', 'पथ',
             'वन', 'तन', 'धन', 'लक', 'सप', 'डब', 'ठग', 'घस', 'जग', 'दम', 'मल', 'दस', 'रज', 'फन',
             'बच', 'टक', 'गज', 'बल', 'खल', 'छल', 'ढल', 'थल', 'गण', 'धम', 'पक', 'नर', 'गर', 'भट', 'टम',
-            'सज', 'नथ', 'झग', 'ठस', 'झट', 'मठ', 'कन', 'फक'
+            'सज', 'नथ', 'झग', 'ठस', 'झट', 'मठ', 'कन', 'फक', 'जग', 'मग', 'खग', 'पग', 'ठग', 'नग', 'नल', 'चल', 'कल', 'बल',
+            'पल', 'फल', 'जल', 'छल', 'तल', 'थल', 'हल', 'पर', 'कर', 'डर',
+            'मर', 'सर', 'पथ', 'रथ', 'बस', 'रस', 'दस', 'एक', 'ढक', 'अंक',
+            'खत', 'छत', 'घर', 'धन', 'तन', 'वन', 'फण', 'गम', 'हम', 'जड़',
+            'लड़', 'पढ़', 'सब', 'टब', 'गज', 'आग', 'ईख', 'चख', 'कई', 'कद',
+            'उठ', 'आठ'
         ];
 
         let mode = 'letter'; // default mode
@@ -126,32 +140,79 @@
                 showRandomWord();
             }
         }
+        function setMode(selectedMode) {
+            mode = selectedMode;
+
+            // Remove 'active' from all
+            document.getElementById('letterBtn').classList.remove('active');
+            document.getElementById('wordBtn').classList.remove('active');
+            document.getElementById('comboBtn').classList.remove('active');
+
+            // Add active to selected
+            if (mode === 'letter') {
+                document.getElementById('letterBtn').classList.add('active');
+                showRandomLetter();
+            } else if (mode === 'word') {
+                document.getElementById('wordBtn').classList.add('active');
+                showRandomWord();
+            } else {
+                document.getElementById('comboBtn').classList.add('active');
+                showLetterCombo();
+            }
+        }
+        function showLetterCombo() {
+            const display = document.getElementById('display');
+            if (simpleWords.length === 0) return;
+            const word = simpleWords[Math.floor(Math.random() * simpleWords.length)];
+
+            display.classList.add('small'); // 👈 Add small font for combo mode
+
+            if (word.length === 2) {
+                const result = `${word[0]} + ${word[1]} = ${word}`;
+                display.innerText = result;
+            } else if (word.length === 3) {
+                const letters = word.split('');
+                const result = `${letters.join(' + ')} = ${word}`;
+                display.innerText = result;
+            } else {
+                display.innerText = word;
+            }
+        }
+
+
 
         function showRandomLetter() {
+            const display = document.getElementById('display');
+            display.classList.remove('small'); // Reset font size
             const randomIndex = Math.floor(Math.random() * hindiLetters.length);
-            document.getElementById('display').innerText = hindiLetters[randomIndex];
+            display.innerText = hindiLetters[randomIndex];
         }
 
         function showRandomWord() {
+            const display = document.getElementById('display');
+            display.classList.remove('small'); // Reset font size
             const randomIndex = Math.floor(Math.random() * simpleWords.length);
-            document.getElementById('display').innerText = simpleWords[randomIndex];
+            display.innerText = simpleWords[randomIndex];
         }
 
         function handleBoxClick() {
             if (mode === 'letter') {
                 showRandomLetter();
-            } else {
+            } else if (mode === 'word') {
                 showRandomWord();
+            } else if (mode === 'combo') {
+                showLetterCombo();
             }
         }
-        document.addEventListener('keydown', function(event) {
-  const keysToTrigger = ['Enter', ' ', 'ArrowRight', 'ArrowDown'];
 
-  if (keysToTrigger.includes(event.key)) {
-    event.preventDefault();
-    handleBoxClick();
-  }
-});
+        document.addEventListener('keydown', function (event) {
+            const keysToTrigger = ['Enter', ' ', 'ArrowRight', 'ArrowDown'];
+
+            if (keysToTrigger.includes(event.key)) {
+                event.preventDefault();
+                handleBoxClick();
+            }
+        });
 
     </script>
 
